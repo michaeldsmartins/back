@@ -1,0 +1,18 @@
+{
+    "sourceFile": "api/index.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1737575356916,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1737575356916,
+            "name": "Commit-0",
+            "content": "// api/users.js\r\nimport { promises as fs } from 'fs';\r\nimport path from 'path';\r\n\r\nconst dbPath = path.join(process.cwd(), 'database.json');\r\n\r\nexport default async function handler(req, res) {\r\n  if (req.method === 'GET') {\r\n    try {\r\n      const data = await fs.readFile(dbPath, 'utf-8');\r\n      const users = JSON.parse(data);\r\n      res.status(200).json(users);\r\n    } catch (err) {\r\n      res.status(500).json({ error: 'Erro ao ler os usuários.' });\r\n    }\r\n  } else if (req.method === 'POST') {\r\n    let body = '';\r\n    req.on('data', chunk => {\r\n      body += chunk.toString();\r\n    });\r\n\r\n    req.on('end', async () => {\r\n      try {\r\n        const { name, email } = JSON.parse(body);\r\n\r\n        if (!name || !email) {\r\n          res.status(400).json({ error: 'Nome e email são obrigatórios.' });\r\n          return;\r\n        }\r\n\r\n        const data = await fs.readFile(dbPath, 'utf-8');\r\n        const users = JSON.parse(data);\r\n        const newUser = { id: Date.now(), name, email };\r\n        users.push(newUser);\r\n\r\n        await fs.writeFile(dbPath, JSON.stringify(users, null, 2));\r\n\r\n        res.status(201).json(newUser);\r\n      } catch (err) {\r\n        res.status(500).json({ error: 'Erro ao processar a solicitação.' });\r\n      }\r\n    });\r\n  } else {\r\n    res.status(404).json({ error: 'Rota não encontrada.' });\r\n  }\r\n}\r\n"
+        }
+    ]
+}
